@@ -1,0 +1,5 @@
+{
+  "name": "GAS Script Generator from Files",
+  "description": "Generates a Google Apps Script for creating Google Slides presentations from user-provided text, documents, or media files based on a specific template.",
+  "requestFramePermissions": []
+}
