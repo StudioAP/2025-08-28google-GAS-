@@ -4,13 +4,13 @@ import { PROMPT } from '../constants';
 import { fileToGenerativePart } from '../utils/fileProcessor';
 import { ProcessedFilePart } from "../types";
 
-if (!process.env.API_KEY) {
-  throw new Error("API_KEY environment variable not set. This app requires a configured Gemini API key to function.");
-}
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const generateGasScript = async (files: File[], inputText: string): Promise<string> => {
+  if (!process.env.API_KEY) {
+    // This error will now be caught by the try/catch block in App.tsx
+    throw new Error("API_KEY environment variable not set. Please configure it in your deployment environment.");
+  }
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  
   const contentParts: ({ text: string } | ProcessedFilePart)[] = [{ text: PROMPT }];
 
   if (inputText.trim()) {
