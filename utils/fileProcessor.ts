@@ -1,15 +1,13 @@
 
-import type { ProcessedFilePart } from '../types';
-
-export const fileToGenerativePart = async (file: File): Promise<ProcessedFilePart> => {
-  const base64encodedData = await new Promise<string>((resolve, reject) => {
+export const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
       if (typeof reader.result !== 'string') {
         return reject(new Error('Failed to read file as data URL.'));
       }
-      const dataUrl = reader.result;
-      const base64Data = dataUrl.split(',')[1];
+      // Return only the base64 part of the data URL
+      const base64Data = reader.result.split(',')[1];
       if (!base64Data) {
         return reject(new Error('Failed to extract base64 data from file.'));
       }
@@ -20,11 +18,4 @@ export const fileToGenerativePart = async (file: File): Promise<ProcessedFilePar
     }
     reader.readAsDataURL(file);
   });
-  
-  return {
-    inlineData: {
-      mimeType: file.type,
-      data: base64encodedData,
-    },
-  };
 };

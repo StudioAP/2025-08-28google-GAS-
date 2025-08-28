@@ -3,7 +3,7 @@ import React, { useState, useCallback } from 'react';
 import { FileInput } from './components/FileInput';
 import { CodeOutput } from './components/CodeOutput';
 import { Spinner } from './components/Spinner';
-import { generateGasScript } from './services/geminiService';
+import { fileToBase64 } from './utils/fileProcessor';
 import { ScriptIcon, AlertTriangleIcon, TypeIcon } from './components/icons';
 
 const App: React.FC = () => {
@@ -40,8 +40,33 @@ const App: React.FC = () => {
     setGeneratedScript('');
 
     try {
-      const script = await generateGasScript(files, inputText);
+      const filePayloads = await Promise.all(
+        files.map(async (file) => ({
+          name: file.name,
+          type: file.type,
+          data: await fileToBase64(file),
+        }))
+      );
+
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          files: filePayloads,
+          inputText: inputText,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Request failed with status ${response.status}`);
+      }
+      
+      const { script } = await response.json();
       setGeneratedScript(script);
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
       setError(`Failed to generate script: ${errorMessage}`);
