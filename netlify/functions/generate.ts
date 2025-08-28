@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import { PROMPT } from '../constants';
+import { PROMPT } from '../../constants';
 
 // Define types locally to avoid potential path issues during Netlify build
 interface ProcessedFilePart {
